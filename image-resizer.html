@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer — SnapTools | Free Online Image Resizing Tool</title>
+    <meta name="description" content="Resize images to exact dimensions or scale by percentage. Perfect for social media. Free, no upload needed — all processing happens in your browser.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/image-resizer.html">
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-resize">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>Image Resizer</h2>
+        </div>
+        <div class="drop-zone" id="resize-drop">
+            <div class="icon">📐</div>
+            <h3>Drop your image here</h3>
+            <p>or click to browse</p>
+            <input type="file" hidden accept="image/*" id="resize-input">
+        </div>
+        <div class="controls" style="display:none;" id="resize-controls">
+            <div class="control-row">
+                <label>Width (px)</label>
+                <input type="number" id="resize-w" min="1" max="10000" placeholder="Width">
+            </div>
+            <div class="control-row">
+                <label>Height (px)</label>
+                <input type="number" id="resize-h" min="1" max="10000" placeholder="Height">
+            </div>
+            <div class="control-row">
+                <label>Lock Ratio</label>
+                <input type="checkbox" id="resize-lock" checked>
+            </div>
+        </div>
+        <div class="preview-area" style="display:none;" id="resize-preview">
+            <canvas id="resize-canvas"></canvas>
+            <div class="info-bar" id="resize-info"></div>
+        </div>
+        <div style="text-align:center;" id="resize-actions" hidden>
+            <button class="action-btn" onclick="downloadResized()">Download Resized Image</button>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online Image Resizer</h2>
+        <p>SnapTools Image Resizer makes it easy to change the dimensions of any image to the exact pixel size you need. Whether you're preparing images for a website, resizing photos for social media profiles, or creating thumbnails, our tool gives you precise control over width and height with an optional aspect ratio lock to prevent distortion.</p>
+        <p>Social media platforms each have their own ideal image dimensions — Instagram prefers square 1080×1080 images, Facebook cover photos need 820×312, and Twitter headers call for 1500×500. With SnapTools, you can quickly resize to any of these dimensions without installing desktop software or learning complex editing tools.</p>
+        <p>Everything runs directly in your browser. Your images are processed locally on your device using the HTML5 Canvas API, which means there are no uploads, no waiting for server processing, and no privacy concerns. Resize as many images as you like, completely free.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free online image tools. All processing happens in your browser. Your images never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+const state = {};
+
+function loadImage(file) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+function formatBytes(bytes) {
+    if(bytes < 1024) return bytes + ' B';
+    if(bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(2) + ' MB';
+}
+
+function downloadCanvas(canvas, filename, format, quality) {
+    canvas.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+    }, format || 'image/png', quality);
+}
+
+function setupDropZone(toolName, onFile) {
+    const drop = document.getElementById(toolName + '-drop');
+    const input = document.getElementById(toolName + '-input');
+
+    drop.addEventListener('click', () => input.click());
+    input.addEventListener('change', e => { if(e.target.files[0]) onFile(e.target.files[0]); });
+
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+    drop.addEventListener('drop', e => {
+        e.preventDefault(); drop.classList.remove('dragover');
+        if(e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]);
+    });
+}
+
+setupDropZone('resize', async (file) => {
+    state.resizeImg = await loadImage(file);
+    document.getElementById('resize-controls').style.display = '';
+    document.getElementById('resize-preview').style.display = '';
+    document.getElementById('resize-actions').hidden = false;
+    document.getElementById('resize-w').value = state.resizeImg.width;
+    document.getElementById('resize-h').value = state.resizeImg.height;
+    state.resizeRatio = state.resizeImg.width / state.resizeImg.height;
+    updateResize();
+});
+
+document.getElementById('resize-w').addEventListener('input', () => {
+    if(document.getElementById('resize-lock').checked) {
+        document.getElementById('resize-h').value = Math.round(document.getElementById('resize-w').value / state.resizeRatio);
+    }
+    updateResize();
+});
+document.getElementById('resize-h').addEventListener('input', () => {
+    if(document.getElementById('resize-lock').checked) {
+        document.getElementById('resize-w').value = Math.round(document.getElementById('resize-h').value * state.resizeRatio);
+    }
+    updateResize();
+});
+
+function updateResize() {
+    const img = state.resizeImg;
+    const w = parseInt(document.getElementById('resize-w').value) || img.width;
+    const h = parseInt(document.getElementById('resize-h').value) || img.height;
+    const canvas = document.getElementById('resize-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = w; canvas.height = h;
+    ctx.drawImage(img, 0, 0, w, h);
+    document.getElementById('resize-info').innerHTML = `
+        <span>Original: ${img.width} × ${img.height}</span>
+        <span>New: <b class="highlight">${w} × ${h}</b></span>
+    `;
+}
+
+function downloadResized() {
+    downloadCanvas(document.getElementById('resize-canvas'), 'resized.png');
+}
+</script>
+</body>
+</html>

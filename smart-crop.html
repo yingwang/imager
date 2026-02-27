@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Crop — SnapTools | Free Online Image Cropping Tool</title>
+    <meta name="description" content="Crop images to popular aspect ratios like 1:1, 4:3, 16:9 or custom dimensions. Free, no upload needed — all processing happens in your browser.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/smart-crop.html">
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-crop">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>Smart Crop</h2>
+        </div>
+        <div class="drop-zone" id="crop-drop">
+            <div class="icon">✂️</div>
+            <h3>Drop your image here</h3>
+            <p>or click to browse</p>
+            <input type="file" hidden accept="image/*" id="crop-input">
+        </div>
+        <div class="controls" style="display:none;" id="crop-controls">
+            <div class="control-row">
+                <label>Aspect Ratio</label>
+                <div class="size-grid">
+                    <button class="size-btn selected" onclick="setCropRatio(this, 1, 1)">1:1</button>
+                    <button class="size-btn" onclick="setCropRatio(this, 4, 3)">4:3</button>
+                    <button class="size-btn" onclick="setCropRatio(this, 16, 9)">16:9</button>
+                    <button class="size-btn" onclick="setCropRatio(this, 3, 4)">3:4</button>
+                    <button class="size-btn" onclick="setCropRatio(this, 9, 16)">9:16</button>
+                </div>
+            </div>
+        </div>
+        <div class="preview-area" style="display:none;" id="crop-preview">
+            <canvas id="crop-canvas"></canvas>
+            <div class="info-bar" id="crop-info"></div>
+        </div>
+        <div style="text-align:center;" id="crop-actions" hidden>
+            <button class="action-btn" onclick="downloadCropped()">Download Cropped Image</button>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online Smart Crop Tool</h2>
+        <p>SnapTools Smart Crop automatically crops your images to popular aspect ratios with a single click. Choose from presets like 1:1 for Instagram posts, 16:9 for YouTube thumbnails and widescreen displays, 4:3 for classic photo prints, or portrait ratios like 3:4 and 9:16 for stories and reels. The tool intelligently centers the crop to keep the most important part of your image.</p>
+        <p>Cropping is one of the most common image editing tasks, whether you're preparing content for social media, fitting images into a website layout, or trimming unwanted edges from a photograph. Our smart cropping algorithm ensures the center of your image is preserved while adjusting to your chosen aspect ratio.</p>
+        <p>Like all SnapTools, Smart Crop runs entirely in your browser. There's no file upload, no server processing, and no waiting. Your images remain on your device at all times, and you can crop as many images as you need without any limits or registration.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free online image tools. All processing happens in your browser. Your images never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+const state = {};
+
+function loadImage(file) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+function formatBytes(bytes) {
+    if(bytes < 1024) return bytes + ' B';
+    if(bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(2) + ' MB';
+}
+
+function downloadCanvas(canvas, filename, format, quality) {
+    canvas.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+    }, format || 'image/png', quality);
+}
+
+function setupDropZone(toolName, onFile) {
+    const drop = document.getElementById(toolName + '-drop');
+    const input = document.getElementById(toolName + '-input');
+
+    drop.addEventListener('click', () => input.click());
+    input.addEventListener('change', e => { if(e.target.files[0]) onFile(e.target.files[0]); });
+
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+    drop.addEventListener('drop', e => {
+        e.preventDefault(); drop.classList.remove('dragover');
+        if(e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]);
+    });
+}
+
+state.cropRatio = [1, 1];
+
+function setCropRatio(btn, w, h) {
+    document.querySelectorAll('#crop-controls .size-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.cropRatio = [w, h];
+    if(state.cropImg) updateCrop();
+}
+
+setupDropZone('crop', async (file) => {
+    state.cropImg = await loadImage(file);
+    document.getElementById('crop-controls').style.display = '';
+    document.getElementById('crop-preview').style.display = '';
+    document.getElementById('crop-actions').hidden = false;
+    updateCrop();
+});
+
+function updateCrop() {
+    const img = state.cropImg;
+    const [rw, rh] = state.cropRatio;
+    const targetRatio = rw / rh;
+    const imgRatio = img.width / img.height;
+
+    let sw, sh, sx, sy;
+    if(imgRatio > targetRatio) {
+        sh = img.height; sw = sh * targetRatio;
+        sx = (img.width - sw) / 2; sy = 0;
+    } else {
+        sw = img.width; sh = sw / targetRatio;
+        sx = 0; sy = (img.height - sh) / 2;
+    }
+
+    const canvas = document.getElementById('crop-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = Math.round(sw); canvas.height = Math.round(sh);
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+
+    document.getElementById('crop-info').innerHTML = `
+        <span>Cropped: <b class="highlight">${canvas.width} × ${canvas.height}</b></span>
+        <span>Ratio: <b>${rw}:${rh}</b></span>
+    `;
+}
+
+function downloadCropped() {
+    downloadCanvas(document.getElementById('crop-canvas'), 'cropped.png');
+}
+</script>
+</body>
+</html>

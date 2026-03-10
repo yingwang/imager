@@ -70,6 +70,18 @@
         <p>Need to convert a PNG to JPEG, a BMP to WebP, or any other image format combination? SnapTools Format Converter handles it all instantly in your browser. Simply drop your image, choose a target format, and download the converted file — no software installation or account required.</p>
         <p>Different image formats serve different purposes. PNG is ideal for graphics with transparency, JPEG works best for photographs with its efficient lossy compression, WebP offers superior compression for the web, and BMP provides uncompressed bitmap data. Choosing the right format can dramatically reduce file sizes or preserve the quality your project demands.</p>
         <p>All conversion happens locally on your device using the HTML5 Canvas API. Your images are never uploaded to any server, ensuring complete privacy and instant results regardless of your internet connection speed.</p>
+
+        <h2>Understanding Image Formats</h2>
+        <p>Each image format has unique strengths. JPEG uses lossy compression that excels at photographs, producing small files with minimal visible quality loss. PNG uses lossless compression and supports transparency, making it ideal for logos, icons, and graphics with sharp edges. WebP is a modern format developed by Google that offers both lossy and lossless modes with superior compression ratios. BMP is an uncompressed bitmap format that preserves every pixel but produces very large files.</p>
+        <p>Choosing the right format depends on your use case. Converting a BMP screenshot to PNG preserves quality while dramatically reducing file size. Converting a PNG photograph to JPEG or WebP can reduce the file by 80% or more. WebP is increasingly the best choice for web images, offering the smallest files with excellent quality.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>Does converting formats reduce image quality?</h3>
+        <p>Converting to a lossless format like PNG preserves image quality perfectly. Converting to lossy formats like JPEG or WebP may introduce minor quality loss, but SnapTools uses a high quality setting (95%) by default to minimize this. Converting from JPEG to PNG will not restore any quality that was already lost in the original JPEG compression.</p>
+        <h3>What happens to transparency when I convert?</h3>
+        <p>PNG and WebP support transparency (alpha channels), but JPEG and BMP do not. If you convert a transparent PNG to JPEG, the transparent areas will be filled with a white background. To preserve transparency, convert to PNG or WebP format.</p>
+        <h3>Which format should I use for my website?</h3>
+        <p>For photographs, use WebP (with JPEG as a fallback for older browsers). For logos, icons, and graphics with text or transparency, use PNG or WebP. BMP should generally be avoided for web use due to its large file size. WebP offers the best compression-to-quality ratio for most web applications.</p>
     </section>
 </main>
 

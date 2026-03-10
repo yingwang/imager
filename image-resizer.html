@@ -73,6 +73,18 @@
         <p>SnapTools Image Resizer makes it easy to change the dimensions of any image to the exact pixel size you need. Whether you're preparing images for a website, resizing photos for social media profiles, or creating thumbnails, our tool gives you precise control over width and height with an optional aspect ratio lock to prevent distortion.</p>
         <p>Social media platforms each have their own ideal image dimensions — Instagram prefers square 1080×1080 images, Facebook cover photos need 820×312, and Twitter headers call for 1500×500. With SnapTools, you can quickly resize to any of these dimensions without installing desktop software or learning complex editing tools.</p>
         <p>Everything runs directly in your browser. Your images are processed locally on your device using the HTML5 Canvas API, which means there are no uploads, no waiting for server processing, and no privacy concerns. Resize as many images as you like, completely free.</p>
+
+        <h2>Image Sizing Best Practices</h2>
+        <p>Serving properly sized images is one of the most impactful performance optimizations for websites. An image displayed at 400×300 pixels on screen should not be a 4000×3000 pixel file — that wastes bandwidth and slows page load times. Always resize images to match their display dimensions, accounting for high-DPI (Retina) displays by providing 2× resolution versions.</p>
+        <p>For social media, each platform has recommended image dimensions. Instagram posts work best at 1080×1080 pixels, Facebook cover photos at 820×312, Twitter headers at 1500×500, and LinkedIn banners at 1584×396. Using the correct dimensions ensures your images display without unwanted cropping or stretching.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>Does resizing affect image quality?</h3>
+        <p>Scaling an image down generally preserves quality well, as the browser resamples pixels to create a smaller, sharp image. Scaling up (enlarging) can reduce quality because new pixels must be interpolated from existing data, which may result in a softer or pixelated appearance. For best results, start with the highest resolution original available.</p>
+        <h3>What's the difference between resizing by pixels and by percentage?</h3>
+        <p>Resizing by pixels lets you set exact target dimensions, which is useful when you need a specific size for a website layout or social media platform. Resizing by percentage scales the image proportionally — entering 50% will halve both the width and height, resulting in an image that is one-quarter the original area.</p>
+        <h3>Will the aspect ratio be maintained?</h3>
+        <p>SnapTools provides an option to lock the aspect ratio. When locked, changing the width automatically adjusts the height (and vice versa) to maintain the original proportions. You can unlock the aspect ratio to set custom, independent width and height values if needed.</p>
     </section>
 </main>
 

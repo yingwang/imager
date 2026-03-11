@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter — SnapTools | Free Online JSON Pretty Print & Validator</title>
+    <meta name="description" content="Format, validate, and minify JSON data with syntax highlighting. Free, private, browser-based JSON tool — no upload needed.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/json-formatter.html">
+    <meta property="og:title" content="Free JSON Formatter — Pretty Print & Validate JSON">
+    <meta property="og:description" content="Format, validate, and minify JSON data with syntax highlighting. Free, private, browser-based.">
+    <meta property="og:url" content="https://snaptools.app/json-formatter.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SnapTools">
+
+    <meta name="google-adsense-account" content="ca-pub-5454343993694013">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .json-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+        .json-panel label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .json-panel textarea {
+            width: 100%; height: 400px; resize: vertical;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text);
+            border-radius: var(--radius-sm); padding: 1rem; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem; line-height: 1.6; tab-size: 2;
+        }
+        .json-panel textarea:focus { outline: none; border-color: var(--accent); }
+        .json-output {
+            width: 100%; height: 400px; overflow: auto;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 1rem; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem; line-height: 1.6; white-space: pre-wrap; word-break: break-all;
+        }
+        .json-output .str { color: var(--green); }
+        .json-output .num { color: var(--orange); }
+        .json-output .bool { color: var(--blue); }
+        .json-output .null { color: var(--pink); }
+        .json-output .key { color: var(--accent-light); }
+        .json-error { color: var(--pink); font-size: 0.85rem; margin-top: 0.5rem; font-family: 'Space Mono', monospace; }
+        .json-valid { color: var(--green); font-size: 0.85rem; margin-top: 0.5rem; font-family: 'Space Mono', monospace; }
+        .json-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1.5rem; }
+        @media (max-width: 768px) { .json-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-json">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>JSON Formatter</h2>
+        </div>
+
+        <div class="json-container">
+            <div class="json-panel">
+                <label>Input JSON</label>
+                <textarea id="json-input" placeholder='Paste your JSON here...&#10;&#10;Example:&#10;{"name":"SnapTools","version":1,"features":["format","validate","minify"]}'></textarea>
+                <div id="json-status"></div>
+            </div>
+            <div class="json-panel">
+                <label>Output</label>
+                <div class="json-output" id="json-output"></div>
+            </div>
+        </div>
+
+        <div class="json-actions">
+            <button class="action-btn" onclick="formatJSON()">Format (Pretty Print)</button>
+            <button class="secondary-btn" onclick="minifyJSON()">Minify</button>
+            <button class="secondary-btn" onclick="copyOutput()">Copy Output</button>
+            <button class="secondary-btn" onclick="clearJSON()">Clear</button>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online JSON Formatter</h2>
+        <p>SnapTools JSON Formatter helps you pretty-print, validate, and minify JSON data with syntax highlighting. Instantly spot errors, explore nested structures, and format messy JSON into clean, readable output.</p>
+        <p>All processing happens in your browser — your data never leaves your device.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>What does the JSON Formatter do?</h3>
+        <p>It takes raw JSON data and formats it with proper indentation and syntax highlighting. It also validates the JSON and shows you exactly where errors are if the data is malformed.</p>
+        <h3>Can I minify JSON?</h3>
+        <p>Yes! Click the "Minify" button to remove all whitespace and compress your JSON into a single line — perfect for APIs and configuration files.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free browser-based tools. All processing happens locally. Your files never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+const jsonInput = document.getElementById('json-input');
+const jsonOutput = document.getElementById('json-output');
+const jsonStatus = document.getElementById('json-status');
+
+jsonInput.addEventListener('input', () => {
+    const val = jsonInput.value.trim();
+    if (!val) { jsonStatus.innerHTML = ''; jsonOutput.innerHTML = ''; return; }
+    try {
+        JSON.parse(val);
+        jsonStatus.innerHTML = '<div class="json-valid">Valid JSON</div>';
+    } catch(e) {
+        jsonStatus.innerHTML = `<div class="json-error">Error: ${e.message}</div>`;
+    }
+});
+
+function formatJSON() {
+    const val = jsonInput.value.trim();
+    if (!val) return;
+    try {
+        const parsed = JSON.parse(val);
+        const formatted = JSON.stringify(parsed, null, 2);
+        jsonOutput.innerHTML = syntaxHighlight(formatted);
+        jsonStatus.innerHTML = '<div class="json-valid">Valid JSON — Formatted</div>';
+    } catch(e) {
+        jsonStatus.innerHTML = `<div class="json-error">Error: ${e.message}</div>`;
+        jsonOutput.textContent = '';
+    }
+}
+
+function minifyJSON() {
+    const val = jsonInput.value.trim();
+    if (!val) return;
+    try {
+        const parsed = JSON.parse(val);
+        const minified = JSON.stringify(parsed);
+        jsonOutput.textContent = minified;
+        jsonStatus.innerHTML = '<div class="json-valid">Valid JSON — Minified</div>';
+    } catch(e) {
+        jsonStatus.innerHTML = `<div class="json-error">Error: ${e.message}</div>`;
+    }
+}
+
+function syntaxHighlight(json) {
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+        let cls = 'num';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'str';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'bool';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}
+
+function copyOutput() {
+    const text = jsonOutput.textContent;
+    if (text) navigator.clipboard.writeText(text);
+}
+
+function clearJSON() {
+    jsonInput.value = '';
+    jsonOutput.innerHTML = '';
+    jsonStatus.innerHTML = '';
+}
+</script>
+</body>
+</html>

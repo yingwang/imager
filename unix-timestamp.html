@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unix Timestamp Converter — SnapTools | Free Online Epoch Converter</title>
+    <meta name="description" content="Convert between Unix timestamps and human-readable dates. Supports seconds and milliseconds. Free, private, browser-based.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/unix-timestamp.html">
+    <meta property="og:title" content="Free Unix Timestamp Converter — Epoch to Date Online">
+    <meta property="og:description" content="Convert between Unix timestamps and human-readable dates. Free, private, browser-based.">
+    <meta property="og:url" content="https://snaptools.app/unix-timestamp.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SnapTools">
+
+    <meta name="google-adsense-account" content="ca-pub-5454343993694013">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .ts-current {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 1.5rem; text-align: center; margin-top: 1.5rem;
+        }
+        .ts-current .label { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+        .ts-current .value {
+            font-family: 'Space Mono', monospace; font-size: 2rem; color: var(--accent-light);
+            font-weight: 700; letter-spacing: 1px;
+        }
+        .ts-current .date { font-size: 0.9rem; color: var(--text-dim); margin-top: 0.3rem; font-family: 'Space Mono', monospace; }
+        .ts-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+        .ts-section {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 1.5rem;
+        }
+        .ts-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+        .ts-section label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0.3rem; }
+        .ts-section input, .ts-section select {
+            width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+            border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; font-family: 'Space Mono', monospace;
+            font-size: 0.9rem; margin-bottom: 0.8rem;
+        }
+        .ts-section input:focus, .ts-section select:focus { outline: none; border-color: var(--accent); }
+        .ts-result {
+            background: var(--surface2); border-radius: var(--radius-sm); padding: 0.8rem;
+            font-family: 'Space Mono', monospace; font-size: 0.85rem; margin-top: 0.5rem;
+            min-height: 40px; line-height: 1.6;
+        }
+        .ts-result .result-label { color: var(--text-dim); font-size: 0.75rem; display: block; }
+        .ts-result .result-value { color: var(--green); }
+        @media (max-width: 768px) { .ts-sections { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-timestamp">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>Unix Timestamp Converter</h2>
+        </div>
+
+        <div class="ts-current">
+            <div class="label">Current Unix Timestamp</div>
+            <div class="value" id="current-ts"></div>
+            <div class="date" id="current-date"></div>
+        </div>
+
+        <div class="ts-sections">
+            <div class="ts-section">
+                <h3>Timestamp → Date</h3>
+                <label>Unix Timestamp</label>
+                <input type="text" id="ts-input" placeholder="e.g. 1710000000">
+                <label>Unit</label>
+                <select id="ts-unit">
+                    <option value="s">Seconds</option>
+                    <option value="ms">Milliseconds</option>
+                </select>
+                <button class="action-btn" style="width:100%;margin-top:0;" onclick="tsToDate()">Convert to Date</button>
+                <div class="ts-result" id="ts-to-date-result"></div>
+            </div>
+
+            <div class="ts-section">
+                <h3>Date → Timestamp</h3>
+                <label>Date</label>
+                <input type="date" id="date-input">
+                <label>Time</label>
+                <input type="time" id="time-input" step="1" value="00:00:00">
+                <button class="action-btn" style="width:100%;margin-top:0;" onclick="dateToTs()">Convert to Timestamp</button>
+                <div class="ts-result" id="date-to-ts-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online Unix Timestamp Converter</h2>
+        <p>SnapTools Unix Timestamp Converter lets you convert between Unix epoch timestamps and human-readable dates. Supports both seconds and milliseconds. See the current timestamp update live.</p>
+        <p>All processing happens in your browser — no data is sent anywhere.</p>
+
+        <h2>What is a Unix Timestamp?</h2>
+        <p>A Unix timestamp (or epoch time) is the number of seconds that have elapsed since January 1, 1970, 00:00:00 UTC. It's widely used in programming, databases, APIs, and log files to represent dates and times in a compact, timezone-independent format.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>What's the difference between seconds and milliseconds?</h3>
+        <p>A standard Unix timestamp is in seconds (10 digits, e.g., 1710000000). Many programming languages (like JavaScript) use milliseconds (13 digits, e.g., 1710000000000). This tool handles both.</p>
+        <h3>What timezone is used?</h3>
+        <p>Timestamps are converted using your browser's local timezone. The UTC equivalent is also shown for reference.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free browser-based tools. All processing happens locally. Your files never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+function updateCurrent() {
+    const now = Math.floor(Date.now() / 1000);
+    document.getElementById('current-ts').textContent = now;
+    document.getElementById('current-date').textContent = new Date().toISOString();
+}
+updateCurrent();
+setInterval(updateCurrent, 1000);
+
+// Set default date input to today
+const now = new Date();
+document.getElementById('date-input').value = now.toISOString().split('T')[0];
+document.getElementById('time-input').value = now.toTimeString().split(' ')[0];
+
+function tsToDate() {
+    const input = document.getElementById('ts-input').value.trim();
+    const unit = document.getElementById('ts-unit').value;
+    const result = document.getElementById('ts-to-date-result');
+
+    if (!input || isNaN(input)) {
+        result.innerHTML = '<span style="color:var(--pink)">Please enter a valid number</span>';
+        return;
+    }
+
+    const ms = unit === 'ms' ? parseInt(input) : parseInt(input) * 1000;
+    const date = new Date(ms);
+
+    if (isNaN(date.getTime())) {
+        result.innerHTML = '<span style="color:var(--pink)">Invalid timestamp</span>';
+        return;
+    }
+
+    result.innerHTML =
+        '<span class="result-label">Local Time</span>' +
+        '<span class="result-value">' + date.toLocaleString() + '</span><br>' +
+        '<span class="result-label">UTC</span>' +
+        '<span class="result-value">' + date.toUTCString() + '</span><br>' +
+        '<span class="result-label">ISO 8601</span>' +
+        '<span class="result-value">' + date.toISOString() + '</span>';
+}
+
+function dateToTs() {
+    const dateVal = document.getElementById('date-input').value;
+    const timeVal = document.getElementById('time-input').value || '00:00:00';
+    const result = document.getElementById('date-to-ts-result');
+
+    if (!dateVal) {
+        result.innerHTML = '<span style="color:var(--pink)">Please select a date</span>';
+        return;
+    }
+
+    const date = new Date(dateVal + 'T' + timeVal);
+    if (isNaN(date.getTime())) {
+        result.innerHTML = '<span style="color:var(--pink)">Invalid date</span>';
+        return;
+    }
+
+    const seconds = Math.floor(date.getTime() / 1000);
+    const milliseconds = date.getTime();
+
+    result.innerHTML =
+        '<span class="result-label">Seconds</span>' +
+        '<span class="result-value">' + seconds + '</span><br>' +
+        '<span class="result-label">Milliseconds</span>' +
+        '<span class="result-value">' + milliseconds + '</span>';
+}
+</script>
+</body>
+</html>

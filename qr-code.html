@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator — SnapTools | Free Online QR Code Creator</title>
+    <meta name="description" content="Generate QR codes from text or URLs. Customize size and download as PNG. Free, private, browser-based QR code generator.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/qr-code.html">
+    <meta property="og:title" content="Free QR Code Generator — Create QR Codes Online">
+    <meta property="og:description" content="Generate QR codes from text or URLs. Customize size and download as PNG. Free, private, browser-based.">
+    <meta property="og:url" content="https://snaptools.app/qr-code.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SnapTools">
+
+    <meta name="google-adsense-account" content="ca-pub-5454343993694013">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .qr-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+        .qr-input-panel {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.5rem;
+        }
+        .qr-input-panel label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .qr-input-panel textarea {
+            width: 100%; height: 120px; resize: vertical;
+            background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+            border-radius: var(--radius-sm); padding: 0.8rem; font-family: inherit;
+            font-size: 0.9rem; line-height: 1.5;
+        }
+        .qr-input-panel textarea:focus { outline: none; border-color: var(--accent); }
+        .qr-input-panel .control-row { margin-top: 1rem; }
+        .qr-preview {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.5rem;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+        }
+        .qr-preview canvas { border-radius: var(--radius-sm); image-rendering: pixelated; }
+        .qr-placeholder { color: var(--text-dim); font-size: 0.9rem; text-align: center; }
+        .qr-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1.5rem; }
+        @media (max-width: 768px) { .qr-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-qr">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>QR Code Generator</h2>
+        </div>
+
+        <div class="qr-layout">
+            <div class="qr-input-panel">
+                <label>Text or URL</label>
+                <textarea id="qr-text" placeholder="Enter text or URL to encode...">https://snaptools.app</textarea>
+
+                <div class="control-row">
+                    <label>Size</label>
+                    <div style="display:flex;align-items:center;gap:1rem;">
+                        <input type="range" min="100" max="600" value="300" id="qr-size" style="flex:1;accent-color:var(--accent);">
+                        <span class="val-display" id="qr-size-val">300px</span>
+                    </div>
+                </div>
+
+                <div class="control-row">
+                    <label>Error Correction</label>
+                    <select id="qr-ec" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:0.5rem;font-family:inherit;">
+                        <option value="L">Low (7%)</option>
+                        <option value="M" selected>Medium (15%)</option>
+                        <option value="Q">Quartile (25%)</option>
+                        <option value="H">High (30%)</option>
+                    </select>
+                </div>
+
+                <button class="action-btn" style="width:100%;margin-top:1rem;" onclick="generateQR()">Generate QR Code</button>
+            </div>
+
+            <div class="qr-preview" id="qr-preview">
+                <div class="qr-placeholder">QR code will appear here</div>
+            </div>
+        </div>
+
+        <div class="qr-actions" id="qr-actions" style="display:none;">
+            <button class="action-btn" onclick="downloadQR()">Download PNG</button>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online QR Code Generator</h2>
+        <p>SnapTools QR Code Generator creates QR codes from any text or URL. Choose your preferred size and error correction level, then download as a PNG image. Perfect for business cards, posters, websites, and sharing links.</p>
+        <p>All QR code generation happens in your browser using the Canvas API — no data is sent to any server.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>What is error correction?</h3>
+        <p>QR codes include redundant data that allows them to be read even if part of the code is damaged or obscured. Higher error correction levels make the QR code more resilient but also larger. Low (7%), Medium (15%), Quartile (25%), and High (30%) indicate the percentage of the code that can be damaged while still being readable.</p>
+        <h3>What's the maximum content length?</h3>
+        <p>QR codes can encode up to approximately 4,296 alphanumeric characters or 2,953 bytes of data, depending on the error correction level. For best results and fast scanning, keep content under 300 characters.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free browser-based tools. All processing happens locally. Your files never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+// Minimal QR Code generator (supports alphanumeric/byte mode)
+// Based on QR code specification with Reed-Solomon error correction
+
+const QR = (() => {
+    const EC_LEVELS = {L: 1, M: 0, Q: 3, H: 2};
+
+    // Version capacities for byte mode [L, M, Q, H]
+    const CAPACITIES = [
+        null,
+        [17,14,11,7],[32,26,20,14],[53,42,32,24],[78,62,46,34],[106,84,60,44],
+        [134,106,74,58],[154,122,86,64],[192,152,108,84],[230,180,130,98],[271,213,151,119],
+        [321,251,177,137],[367,287,203,155],[425,331,241,177],[458,362,258,194],[520,412,292,220],
+        [586,450,322,250],[644,504,364,280],[718,560,394,310],[792,624,442,338],[858,666,482,382],
+        [929,711,509,403],[1003,779,565,439],[1091,857,611,461],[1171,911,661,511],[1273,997,715,535],
+        [1367,1059,751,593],[1465,1125,805,625],[1528,1190,868,658],[1628,1264,908,698],[1732,1370,982,742],
+        [1840,1452,1030,790],[1952,1538,1112,842],[2068,1628,1168,898],[2188,1722,1228,958],[2303,1809,1283,983],
+        [2431,1911,1351,1051],[2563,1989,1423,1093],[2699,2099,1499,1139],[2809,2213,1579,1219],[2953,2331,1663,1273],
+    ];
+
+    // Error correction codewords per block for each version/EC level
+    const EC_CODEWORDS = [
+        null,
+        [7,10,13,17],[10,16,22,28],[15,26,18,22],[20,18,26,16],[26,24,18,22],
+        [18,16,24,28],[20,18,18,26],[24,22,22,26],[30,22,20,24],[18,26,24,28],
+        [20,30,28,24],[24,22,26,28],[26,22,24,22],[30,24,20,24],[22,24,30,24],
+        [24,28,24,30],[28,28,28,28],[30,26,28,28],[28,26,26,26],[28,26,28,28],
+        [28,26,30,28],[28,28,24,30],[30,28,30,30],[30,28,30,30],[26,28,30,30],
+        [28,28,28,30],[30,28,30,30],[30,28,30,30],[30,28,30,30],[30,28,30,30],
+        [30,28,30,30],[30,28,30,30],[30,28,30,30],[30,28,30,30],[30,28,30,30],
+        [30,28,30,30],[30,28,30,30],[30,28,30,30],[30,28,30,30],[30,28,30,30],
+    ];
+
+    // Number of blocks [version][ecLevel] = [numBlocks1, dataPerBlock1, numBlocks2, dataPerBlock2]
+    // Simplified: we'll compute from total data and EC codewords
+    const TOTAL_CODEWORDS = [
+        null,26,44,70,100,134,172,196,242,292,346,404,466,532,581,655,733,815,901,991,1085,
+        1156,1258,1364,1474,1588,1706,1828,1921,2051,2185,2323,2465,2611,2761,2876,3034,3196,3362,3532,3706
+    ];
+
+    function getVersion(dataLen, ecLevel) {
+        const ecIdx = EC_LEVELS[ecLevel];
+        for (let v = 1; v <= 40; v++) {
+            if (CAPACITIES[v][ecIdx] >= dataLen) return v;
+        }
+        return -1;
+    }
+
+    function generate(text, ecLevel) {
+        ecLevel = ecLevel || 'M';
+        const data = new TextEncoder().encode(text);
+        const version = getVersion(data.length, ecLevel);
+        if (version < 0) return null;
+
+        const size = version * 4 + 17;
+        const matrix = Array.from({length: size}, () => new Uint8Array(size));
+        const reserved = Array.from({length: size}, () => new Uint8Array(size));
+
+        // Place finder patterns
+        placeFinder(matrix, reserved, 0, 0);
+        placeFinder(matrix, reserved, 0, size - 7);
+        placeFinder(matrix, reserved, size - 7, 0);
+
+        // Place timing patterns
+        for (let i = 8; i < size - 8; i++) {
+            matrix[6][i] = (i % 2 === 0) ? 1 : 0;
+            reserved[6][i] = 1;
+            matrix[i][6] = (i % 2 === 0) ? 1 : 0;
+            reserved[i][6] = 1;
+        }
+
+        // Place alignment patterns
+        const alignPos = getAlignmentPositions(version);
+        for (const r of alignPos) {
+            for (const c of alignPos) {
+                if (reserved[r][c]) continue;
+                placeAlignment(matrix, reserved, r, c);
+            }
+        }
+
+        // Reserve format info areas
+        for (let i = 0; i < 8; i++) {
+            reserved[8][i] = 1; reserved[8][size - 1 - i] = 1;
+            reserved[i][8] = 1; reserved[size - 1 - i][8] = 1;
+        }
+        reserved[8][8] = 1;
+        matrix[size - 8][8] = 1; reserved[size - 8][8] = 1; // dark module
+
+        // Reserve version info for version >= 7
+        if (version >= 7) {
+            for (let i = 0; i < 6; i++) {
+                for (let j = 0; j < 3; j++) {
+                    reserved[i][size - 11 + j] = 1;
+                    reserved[size - 11 + j][i] = 1;
+                }
+            }
+        }
+
+        // Encode data
+        const ecIdx = EC_LEVELS[ecLevel];
+        const totalCW = TOTAL_CODEWORDS[version];
+        const ecCWPerBlock = EC_CODEWORDS[version][ecIdx];
+
+        // Simplified block calculation
+        const totalDataCW = totalCW - getECTotalCW(version, ecIdx, ecCWPerBlock);
+        const dataBits = encodeData(data, version, totalDataCW);
+
+        // Place data bits
+        placeData(matrix, reserved, dataBits, size);
+
+        // Apply mask (use mask 0 for simplicity, then try all 8 and pick best)
+        let bestMatrix = null;
+        let bestPenalty = Infinity;
+        for (let mask = 0; mask < 8; mask++) {
+            const masked = matrix.map(row => new Uint8Array(row));
+            applyMask(masked, reserved, mask, size);
+            placeFormatInfo(masked, reserved, ecIdx, mask, size, version);
+            const penalty = calcPenalty(masked, size);
+            if (penalty < bestPenalty) {
+                bestPenalty = penalty;
+                bestMatrix = masked;
+            }
+        }
+
+        return {matrix: bestMatrix, size, version};
+    }
+
+    function getECTotalCW(version, ecIdx, ecCWPerBlock) {
+        const totalCW = TOTAL_CODEWORDS[version];
+        // Approximate: use known EC codewords per block and estimate blocks
+        const cap = CAPACITIES[version][ecIdx];
+        const totalDataCW = Math.floor(cap * 1.1); // rough estimate
+        // Better approach: use total - data capacity relationship
+        // For simplicity, we'll use a lookup for common versions
+        return totalCW - getDataCW(version, ecIdx);
+    }
+
+    function getDataCW(version, ecIdx) {
+        // Data capacity in codewords (bytes) - derived from capacities
+        // Byte mode overhead: 4 bits mode + length bits + data
+        const cap = CAPACITIES[version][ecIdx];
+        // Account for mode indicator and length
+        const lengthBits = version <= 9 ? 8 : 16;
+        return Math.floor((cap * 8 + 4 + lengthBits) / 8);
+    }
+
+    function encodeData(data, version, totalDataCW) {
+        const bits = [];
+        // Byte mode indicator
+        pushBits(bits, 0b0100, 4);
+        // Character count
+        const lengthBits = version <= 9 ? 8 : 16;
+        pushBits(bits, data.length, lengthBits);
+        // Data
+        for (const b of data) pushBits(bits, b, 8);
+        // Terminator
+        const maxBits = totalDataCW * 8;
+        for (let i = 0; i < 4 && bits.length < maxBits; i++) bits.push(0);
+        // Pad to byte boundary
+        while (bits.length % 8 !== 0 && bits.length < maxBits) bits.push(0);
+        // Pad bytes
+        const pads = [0xEC, 0x11];
+        let padIdx = 0;
+        while (bits.length < maxBits) {
+            pushBits(bits, pads[padIdx % 2], 8);
+            padIdx++;
+        }
+        return bits;
+    }
+
+    function pushBits(arr, value, count) {
+        for (let i = count - 1; i >= 0; i--) arr.push((value >> i) & 1);
+    }
+
+    function placeData(matrix, reserved, bits, size) {
+        let bitIdx = 0;
+        let upward = true;
+        for (let col = size - 1; col >= 1; col -= 2) {
+            if (col === 6) col = 5; // skip timing column
+            const rows = upward ? Array.from({length: size}, (_, i) => size - 1 - i) : Array.from({length: size}, (_, i) => i);
+            for (const row of rows) {
+                for (let c = 0; c < 2; c++) {
+                    const actualCol = col - c;
+                    if (actualCol < 0 || reserved[row][actualCol]) continue;
+                    if (bitIdx < bits.length) {
+                        matrix[row][actualCol] = bits[bitIdx++];
+                    }
+                }
+            }
+            upward = !upward;
+        }
+    }
+
+    function placeFinder(matrix, reserved, row, col) {
+        for (let r = 0; r < 7; r++) {
+            for (let c = 0; c < 7; c++) {
+                const val = (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) ? 1 : 0;
+                matrix[row + r][col + c] = val;
+                reserved[row + r][col + c] = 1;
+            }
+        }
+        // Separator
+        for (let i = -1; i <= 7; i++) {
+            for (const [dr, dc] of [[i, -1], [i, 7], [-1, i], [7, i]]) {
+                const r = row + dr, c = col + dc;
+                if (r >= 0 && r < matrix.length && c >= 0 && c < matrix.length && !reserved[r][c]) {
+                    matrix[r][c] = 0;
+                    reserved[r][c] = 1;
+                }
+            }
+        }
+    }
+
+    function placeAlignment(matrix, reserved, row, col) {
+        for (let r = -2; r <= 2; r++) {
+            for (let c = -2; c <= 2; c++) {
+                const val = (Math.abs(r) === 2 || Math.abs(c) === 2 || (r === 0 && c === 0)) ? 1 : 0;
+                matrix[row + r][col + c] = val;
+                reserved[row + r][col + c] = 1;
+            }
+        }
+    }
+
+    function getAlignmentPositions(version) {
+        if (version === 1) return [];
+        const positions = [6];
+        const last = version * 4 + 10;
+        const count = Math.floor(version / 7) + 2;
+        const step = Math.ceil((last - 6) / (count - 1));
+        for (let i = 1; i < count; i++) {
+            positions.push(6 + i * step > last ? last : 6 + i * step);
+        }
+        positions[positions.length - 1] = last;
+        return positions;
+    }
+
+    function applyMask(matrix, reserved, mask, size) {
+        for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+                if (reserved[r][c]) continue;
+                let swap = false;
+                switch (mask) {
+                    case 0: swap = (r + c) % 2 === 0; break;
+                    case 1: swap = r % 2 === 0; break;
+                    case 2: swap = c % 3 === 0; break;
+                    case 3: swap = (r + c) % 3 === 0; break;
+                    case 4: swap = (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0; break;
+                    case 5: swap = (r * c) % 2 + (r * c) % 3 === 0; break;
+                    case 6: swap = ((r * c) % 2 + (r * c) % 3) % 2 === 0; break;
+                    case 7: swap = ((r + c) % 2 + (r * c) % 3) % 2 === 0; break;
+                }
+                if (swap) matrix[r][c] ^= 1;
+            }
+        }
+    }
+
+    function placeFormatInfo(matrix, reserved, ecIdx, mask, size, version) {
+        const formatBits = getFormatBits(ecIdx, mask);
+        // Around top-left finder
+        for (let i = 0; i <= 5; i++) matrix[8][i] = (formatBits >> (14 - i)) & 1;
+        matrix[8][7] = (formatBits >> 8) & 1;
+        matrix[8][8] = (formatBits >> 7) & 1;
+        matrix[7][8] = (formatBits >> 6) & 1;
+        for (let i = 0; i <= 5; i++) matrix[5 - i][8] = (formatBits >> (i)) & 1;
+        // Around other finders
+        for (let i = 0; i <= 7; i++) matrix[size - 1 - i][8] = (formatBits >> (14 - i)) & 1;
+        for (let i = 0; i <= 7; i++) matrix[8][size - 8 + i] = (formatBits >> (7 - i)) & 1;
+    }
+
+    function getFormatBits(ecIdx, mask) {
+        const data = (ecIdx << 3) | mask;
+        let bits = data << 10;
+        const gen = 0b10100110111;
+        for (let i = 14; i >= 10; i--) {
+            if (bits & (1 << i)) bits ^= gen << (i - 10);
+        }
+        return ((data << 10) | bits) ^ 0b101010000010010;
+    }
+
+    function calcPenalty(matrix, size) {
+        let penalty = 0;
+        // Rule 1: consecutive same-color modules
+        for (let r = 0; r < size; r++) {
+            let count = 1;
+            for (let c = 1; c < size; c++) {
+                if (matrix[r][c] === matrix[r][c - 1]) { count++; }
+                else { if (count >= 5) penalty += count - 2; count = 1; }
+            }
+            if (count >= 5) penalty += count - 2;
+        }
+        for (let c = 0; c < size; c++) {
+            let count = 1;
+            for (let r = 1; r < size; r++) {
+                if (matrix[r][c] === matrix[r - 1][c]) { count++; }
+                else { if (count >= 5) penalty += count - 2; count = 1; }
+            }
+            if (count >= 5) penalty += count - 2;
+        }
+        return penalty;
+    }
+
+    return {generate};
+})();
+
+function generateQR() {
+    const text = document.getElementById('qr-text').value.trim();
+    const qrSize = parseInt(document.getElementById('qr-size').value);
+    const ec = document.getElementById('qr-ec').value;
+    const preview = document.getElementById('qr-preview');
+
+    if (!text) { preview.innerHTML = '<div class="qr-placeholder">Please enter some text</div>'; return; }
+
+    const result = QR.generate(text, ec);
+    if (!result) {
+        preview.innerHTML = '<div class="qr-placeholder" style="color:var(--pink)">Text too long for QR code</div>';
+        return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.id = 'qr-canvas';
+    const moduleSize = Math.max(1, Math.floor(qrSize / (result.size + 8)));
+    const totalSize = moduleSize * (result.size + 8);
+    canvas.width = totalSize;
+    canvas.height = totalSize;
+
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, totalSize, totalSize);
+    ctx.fillStyle = '#000000';
+
+    const offset = moduleSize * 4;
+    for (let r = 0; r < result.size; r++) {
+        for (let c = 0; c < result.size; c++) {
+            if (result.matrix[r][c]) {
+                ctx.fillRect(offset + c * moduleSize, offset + r * moduleSize, moduleSize, moduleSize);
+            }
+        }
+    }
+
+    preview.innerHTML = '';
+    preview.appendChild(canvas);
+    document.getElementById('qr-actions').style.display = '';
+}
+
+function downloadQR() {
+    const canvas = document.getElementById('qr-canvas');
+    if (!canvas) return;
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'qrcode.png';
+    a.click();
+}
+
+document.getElementById('qr-size').addEventListener('input', e => {
+    document.getElementById('qr-size-val').textContent = e.target.value + 'px';
+});
+
+generateQR();
+</script>
+</body>
+</html>

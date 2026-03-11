@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker — SnapTools | Free Online Color Tool & Palette Generator</title>
+    <meta name="description" content="Pick colors, generate palettes, and convert between HEX, RGB, and HSL formats. Free, private, browser-based color tool.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/color-picker.html">
+    <meta property="og:title" content="Free Color Picker — HEX, RGB, HSL Converter & Palette Generator">
+    <meta property="og:description" content="Pick colors, generate palettes, and convert between HEX, RGB, and HSL. Free, private, browser-based.">
+    <meta property="og:url" content="https://snaptools.app/color-picker.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SnapTools">
+
+    <meta name="google-adsense-account" content="ca-pub-5454343993694013">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .color-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+        .color-panel {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.5rem;
+        }
+        .color-panel h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+        .color-main-preview {
+            width: 100%; height: 120px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); margin-bottom: 1rem;
+        }
+        .color-input-row {
+            display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem;
+        }
+        .color-input-row label {
+            font-size: 0.85rem; color: var(--text-dim); min-width: 40px;
+            font-family: 'Space Mono', monospace;
+        }
+        .color-input-row input[type="text"] {
+            flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+            border-radius: var(--radius-sm); padding: 0.5rem 0.8rem; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+        .color-input-row input[type="text"]:focus { outline: none; border-color: var(--accent); }
+        .color-input-row input[type="color"] {
+            width: 40px; height: 36px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            cursor: pointer; background: none; padding: 2px;
+        }
+        .color-input-row .copy-btn {
+            background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
+            border-radius: var(--radius-sm); padding: 0.4rem 0.6rem; cursor: pointer;
+            font-size: 0.75rem; font-family: inherit; transition: all 0.2s;
+        }
+        .color-input-row .copy-btn:hover { border-color: var(--accent); color: var(--text); }
+        .color-sliders { margin-top: 1rem; }
+        .color-slider-row {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
+        }
+        .color-slider-row label {
+            font-size: 0.8rem; color: var(--text-dim); min-width: 20px;
+            font-family: 'Space Mono', monospace;
+        }
+        .color-slider-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+        .color-slider-row .val { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-dim); min-width: 35px; text-align: right; }
+
+        .palette-section { margin-top: 1.5rem; }
+        .palette-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.8rem; }
+        .palette-type { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .palette-type button {
+            background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
+            border-radius: var(--radius-sm); padding: 0.4rem 0.8rem; font-size: 0.8rem;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+        }
+        .palette-type button.active { border-color: var(--accent); color: var(--accent-light); background: rgba(108,92,231,0.1); }
+        .palette-grid { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .palette-swatch {
+            flex: 1; min-width: 60px; height: 70px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); cursor: pointer; position: relative;
+            transition: transform 0.2s;
+        }
+        .palette-swatch:hover { transform: scale(1.05); }
+        .palette-swatch .swatch-label {
+            position: absolute; bottom: 4px; left: 0; right: 0; text-align: center;
+            font-size: 0.65rem; font-family: 'Space Mono', monospace; color: rgba(255,255,255,0.8);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        @media (max-width: 768px) { .color-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-color">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>Color Picker</h2>
+        </div>
+
+        <div class="color-layout">
+            <div class="color-panel">
+                <h3>Pick a Color</h3>
+                <div class="color-main-preview" id="color-preview" style="background:#6c5ce7;"></div>
+
+                <div class="color-input-row">
+                    <input type="color" id="color-native" value="#6c5ce7">
+                    <label>HEX</label>
+                    <input type="text" id="color-hex" value="#6c5ce7">
+                    <button class="copy-btn" onclick="copyVal('color-hex')">Copy</button>
+                </div>
+                <div class="color-input-row">
+                    <label>RGB</label>
+                    <input type="text" id="color-rgb" value="rgb(108, 92, 231)" readonly>
+                    <button class="copy-btn" onclick="copyVal('color-rgb')">Copy</button>
+                </div>
+                <div class="color-input-row">
+                    <label>HSL</label>
+                    <input type="text" id="color-hsl" value="hsl(247, 75%, 63%)" readonly>
+                    <button class="copy-btn" onclick="copyVal('color-hsl')">Copy</button>
+                </div>
+
+                <div class="color-sliders">
+                    <div class="color-slider-row">
+                        <label>R</label>
+                        <input type="range" min="0" max="255" value="108" id="slider-r">
+                        <span class="val" id="val-r">108</span>
+                    </div>
+                    <div class="color-slider-row">
+                        <label>G</label>
+                        <input type="range" min="0" max="255" value="92" id="slider-g">
+                        <span class="val" id="val-g">92</span>
+                    </div>
+                    <div class="color-slider-row">
+                        <label>B</label>
+                        <input type="range" min="0" max="255" value="231" id="slider-b">
+                        <span class="val" id="val-b">231</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-panel">
+                <div class="palette-section">
+                    <h3>Color Palette</h3>
+                    <div class="palette-type">
+                        <button class="active" onclick="setPaletteType('complementary')">Complementary</button>
+                        <button onclick="setPaletteType('analogous')">Analogous</button>
+                        <button onclick="setPaletteType('triadic')">Triadic</button>
+                        <button onclick="setPaletteType('shades')">Shades</button>
+                    </div>
+                    <div class="palette-grid" id="palette-grid"></div>
+                </div>
+
+                <div class="palette-section" style="margin-top:2rem;">
+                    <h3>Contrast Preview</h3>
+                    <div id="contrast-preview" style="padding:1.5rem;border-radius:var(--radius-sm);margin-bottom:1rem;border:1px solid var(--border);">
+                        <p style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">Sample Text</p>
+                        <p style="font-size:0.9rem;">The quick brown fox jumps over the lazy dog. This text helps you preview color contrast for readability.</p>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;">
+                        <button class="secondary-btn" style="margin:0;flex:1;" onclick="setContrastMode('dark')">Dark Background</button>
+                        <button class="secondary-btn" style="margin:0;flex:1;" onclick="setContrastMode('light')">Light Background</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online Color Picker</h2>
+        <p>SnapTools Color Picker lets you pick colors using a visual picker or sliders, convert between HEX, RGB, and HSL formats, and generate harmonious color palettes. Perfect for web design, graphic design, and UI development.</p>
+        <p>All processing happens in your browser — no data is sent anywhere.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>What color formats are supported?</h3>
+        <p>HEX (#RRGGBB), RGB (rgb(r, g, b)), and HSL (hsl(h, s%, l%)) formats. Click "Copy" next to any format to copy it to your clipboard.</p>
+        <h3>What are the palette types?</h3>
+        <p>Complementary shows the opposite color on the color wheel. Analogous shows neighboring colors. Triadic shows three evenly-spaced colors. Shades shows lighter and darker variations of your color.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free browser-based tools. All processing happens locally. Your files never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+let currentR = 108, currentG = 92, currentB = 231;
+let paletteType = 'complementary';
+let contrastMode = 'dark';
+
+function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    return {r: parseInt(hex.substring(0, 2), 16), g: parseInt(hex.substring(2, 4), 16), b: parseInt(hex.substring(4, 6), 16)};
+}
+
+function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) { h = s = 0; }
+    else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+            case g: h = ((b - r) / d + 2) / 6; break;
+            case b: h = ((r - g) / d + 4) / 6; break;
+        }
+    }
+    return {h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100)};
+}
+
+function hslToRgb(h, s, l) {
+    h /= 360; s /= 100; l /= 100;
+    let r, g, b;
+    if (s === 0) { r = g = b = l; }
+    else {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1; if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+    return {r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255)};
+}
+
+function updateFromRGB(r, g, b, source) {
+    currentR = r; currentG = g; currentB = b;
+    const hex = rgbToHex(r, g, b);
+    const hsl = rgbToHsl(r, g, b);
+
+    document.getElementById('color-preview').style.background = hex;
+    if (source !== 'hex') document.getElementById('color-hex').value = hex;
+    if (source !== 'native') document.getElementById('color-native').value = hex;
+    document.getElementById('color-rgb').value = `rgb(${r}, ${g}, ${b})`;
+    document.getElementById('color-hsl').value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
+    if (source !== 'slider') {
+        document.getElementById('slider-r').value = r;
+        document.getElementById('slider-g').value = g;
+        document.getElementById('slider-b').value = b;
+    }
+    document.getElementById('val-r').textContent = r;
+    document.getElementById('val-g').textContent = g;
+    document.getElementById('val-b').textContent = b;
+
+    updatePalette();
+    updateContrast();
+}
+
+document.getElementById('color-native').addEventListener('input', e => {
+    const {r, g, b} = hexToRgb(e.target.value);
+    updateFromRGB(r, g, b, 'native');
+});
+
+document.getElementById('color-hex').addEventListener('input', e => {
+    const val = e.target.value.trim();
+    if (/^#?[0-9a-fA-F]{3,6}$/.test(val)) {
+        const {r, g, b} = hexToRgb(val);
+        updateFromRGB(r, g, b, 'hex');
+    }
+});
+
+['r', 'g', 'b'].forEach(channel => {
+    document.getElementById('slider-' + channel).addEventListener('input', () => {
+        updateFromRGB(
+            parseInt(document.getElementById('slider-r').value),
+            parseInt(document.getElementById('slider-g').value),
+            parseInt(document.getElementById('slider-b').value),
+            'slider'
+        );
+    });
+});
+
+function generatePalette(r, g, b, type) {
+    const hsl = rgbToHsl(r, g, b);
+    const colors = [];
+
+    switch (type) {
+        case 'complementary':
+            colors.push({r, g, b});
+            const comp = hslToRgb((hsl.h + 180) % 360, hsl.s, hsl.l);
+            colors.push(comp);
+            const c1 = hslToRgb((hsl.h + 150) % 360, hsl.s, hsl.l);
+            colors.push(c1);
+            const c2 = hslToRgb((hsl.h + 210) % 360, hsl.s, hsl.l);
+            colors.push(c2);
+            const c3 = hslToRgb(hsl.h, Math.max(0, hsl.s - 30), Math.min(100, hsl.l + 20));
+            colors.push(c3);
+            break;
+        case 'analogous':
+            for (let i = -2; i <= 2; i++) {
+                colors.push(hslToRgb((hsl.h + i * 30 + 360) % 360, hsl.s, hsl.l));
+            }
+            break;
+        case 'triadic':
+            colors.push({r, g, b});
+            colors.push(hslToRgb((hsl.h + 120) % 360, hsl.s, hsl.l));
+            colors.push(hslToRgb((hsl.h + 240) % 360, hsl.s, hsl.l));
+            colors.push(hslToRgb(hsl.h, hsl.s, Math.min(100, hsl.l + 15)));
+            colors.push(hslToRgb(hsl.h, hsl.s, Math.max(0, hsl.l - 15)));
+            break;
+        case 'shades':
+            for (let i = 0; i < 5; i++) {
+                const lightness = 20 + i * 15;
+                colors.push(hslToRgb(hsl.h, hsl.s, lightness));
+            }
+            break;
+    }
+    return colors;
+}
+
+function updatePalette() {
+    const colors = generatePalette(currentR, currentG, currentB, paletteType);
+    const grid = document.getElementById('palette-grid');
+    grid.innerHTML = colors.map(c => {
+        const hex = rgbToHex(c.r, c.g, c.b);
+        return `<div class="palette-swatch" style="background:${hex}" onclick="selectPaletteColor('${hex}')"><span class="swatch-label">${hex}</span></div>`;
+    }).join('');
+}
+
+function setPaletteType(type) {
+    paletteType = type;
+    document.querySelectorAll('.palette-type button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    updatePalette();
+}
+
+function selectPaletteColor(hex) {
+    const {r, g, b} = hexToRgb(hex);
+    updateFromRGB(r, g, b, 'palette');
+}
+
+function updateContrast() {
+    const preview = document.getElementById('contrast-preview');
+    const hex = rgbToHex(currentR, currentG, currentB);
+    if (contrastMode === 'dark') {
+        preview.style.background = '#1a1a24';
+        preview.style.color = hex;
+    } else {
+        preview.style.background = '#f5f5f5';
+        preview.style.color = hex;
+    }
+}
+
+function setContrastMode(mode) {
+    contrastMode = mode;
+    updateContrast();
+}
+
+function copyVal(id) {
+    navigator.clipboard.writeText(document.getElementById(id).value);
+}
+
+// Initialize
+updateFromRGB(108, 92, 231, 'init');
+</script>
+</body>
+</html>

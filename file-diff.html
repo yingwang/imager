@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Diff — SnapTools | Free Online Text & Code Comparison Tool</title>
+    <meta name="description" content="Compare two text or code files side by side with highlighted differences. Free, private, browser-based diff tool — no upload needed.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/file-diff.html">
+    <meta property="og:title" content="Free File Diff Tool — Compare Text & Code Online">
+    <meta property="og:description" content="Compare two text or code files side by side with highlighted additions, deletions, and changes. Free, private, browser-based.">
+    <meta property="og:url" content="https://snaptools.app/file-diff.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SnapTools">
+
+    <meta name="google-adsense-account" content="ca-pub-5454343993694013">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .diff-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+        .diff-panel label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .diff-panel textarea {
+            width: 100%; height: 300px; resize: vertical;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text);
+            border-radius: var(--radius-sm); padding: 1rem; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem; line-height: 1.6; tab-size: 4;
+        }
+        .diff-panel textarea:focus { outline: none; border-color: var(--accent); }
+        .diff-panel .file-load { margin-top: 0.5rem; }
+        .diff-panel .file-load input[type="file"] { display: none; }
+        .diff-panel .file-load button {
+            background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
+            border-radius: var(--radius-sm); padding: 0.4rem 0.8rem; font-size: 0.8rem;
+            cursor: pointer; font-family: inherit; transition: border-color 0.2s;
+        }
+        .diff-panel .file-load button:hover { border-color: var(--accent); color: var(--text); }
+        .diff-output {
+            margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); overflow: hidden;
+        }
+        .diff-output-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); background: var(--surface2);
+        }
+        .diff-output-header span { font-size: 0.85rem; color: var(--text-dim); font-family: 'Space Mono', monospace; }
+        .diff-stats { display: flex; gap: 1rem; font-size: 0.8rem; font-family: 'Space Mono', monospace; }
+        .diff-stats .added { color: var(--green); }
+        .diff-stats .removed { color: var(--pink); }
+        .diff-stats .unchanged { color: var(--text-dim); }
+        .diff-lines { overflow-x: auto; font-family: 'Space Mono', monospace; font-size: 0.82rem; line-height: 1.7; }
+        .diff-line { display: flex; white-space: pre; }
+        .diff-line .line-num {
+            min-width: 40px; padding: 0 8px; text-align: right;
+            color: var(--text-dim); user-select: none; opacity: 0.5; flex-shrink: 0;
+        }
+        .diff-line .line-content { padding: 0 1rem; flex: 1; }
+        .diff-line.added { background: rgba(0, 184, 148, 0.1); }
+        .diff-line.added .line-content { color: var(--green); }
+        .diff-line.added .line-num { color: var(--green); opacity: 0.7; }
+        .diff-line.removed { background: rgba(232, 67, 147, 0.1); }
+        .diff-line.removed .line-content { color: var(--pink); }
+        .diff-line.removed .line-num { color: var(--pink); opacity: 0.7; }
+        .diff-line.context { }
+        .diff-separator {
+            padding: 0.3rem 1rem; background: var(--surface2); color: var(--text-dim);
+            font-size: 0.75rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+        }
+        .diff-mode-toggle { display: flex; gap: 0.5rem; }
+        .diff-mode-toggle button {
+            background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
+            border-radius: var(--radius-sm); padding: 0.4rem 0.8rem; font-size: 0.8rem;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+        }
+        .diff-mode-toggle button.active { border-color: var(--accent); color: var(--accent-light); background: rgba(108,92,231,0.1); }
+        @media (max-width: 768px) {
+            .diff-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-diff">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>File Diff</h2>
+        </div>
+
+        <div class="diff-container">
+            <div class="diff-panel">
+                <label>Original Text</label>
+                <textarea id="diff-left" placeholder="Paste original text here or load a file..."></textarea>
+                <div class="file-load">
+                    <button onclick="document.getElementById('diff-file-left').click()">Load File</button>
+                    <input type="file" id="diff-file-left" accept=".txt,.js,.ts,.py,.java,.c,.cpp,.h,.css,.html,.xml,.json,.md,.sh,.rb,.go,.rs,.php,.yml,.yaml,.toml,.ini,.cfg,.conf,.sql,.csv">
+                </div>
+            </div>
+            <div class="diff-panel">
+                <label>Modified Text</label>
+                <textarea id="diff-right" placeholder="Paste modified text here or load a file..."></textarea>
+                <div class="file-load">
+                    <button onclick="document.getElementById('diff-file-right').click()">Load File</button>
+                    <input type="file" id="diff-file-right" accept=".txt,.js,.ts,.py,.java,.c,.cpp,.h,.css,.html,.xml,.json,.md,.sh,.rb,.go,.rs,.php,.yml,.yaml,.toml,.ini,.cfg,.conf,.sql,.csv">
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top: 1.5rem;">
+            <button class="action-btn" onclick="computeDiff()">Compare Files</button>
+            <button class="secondary-btn" onclick="clearAll()">Clear</button>
+        </div>
+
+        <div id="diff-result" style="display:none;">
+            <div class="diff-output">
+                <div class="diff-output-header">
+                    <div class="diff-stats" id="diff-stats"></div>
+                    <div class="diff-mode-toggle">
+                        <button class="active" id="mode-unified" onclick="setMode('unified')">Unified</button>
+                        <button id="mode-inline" onclick="setMode('inline')">Inline</button>
+                    </div>
+                </div>
+                <div class="diff-lines" id="diff-lines"></div>
+            </div>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online File Diff Tool</h2>
+        <p>SnapTools File Diff lets you compare two text or code files side by side with clear visual highlighting. Additions are shown in green, deletions in red, and unchanged context lines help you understand the surrounding code. Perfect for code reviews, debugging, and tracking changes.</p>
+        <p>Unlike cloud-based diff tools, your files never leave your device. All comparison happens entirely in your browser, so your code and text stay private and secure.</p>
+
+        <h2>How It Works</h2>
+        <p>The diff algorithm (based on the Longest Common Subsequence approach) compares both texts line by line and identifies the minimal set of changes needed to transform the original into the modified version. Results are displayed in a unified diff format familiar to developers.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>What file types can I compare?</h3>
+        <p>You can compare any text-based files: source code (.js, .py, .java, .cpp, etc.), configuration files (.json, .yaml, .toml), markup (.html, .xml, .md), and plain text files.</p>
+        <h3>Is there a file size limit?</h3>
+        <p>Since all processing happens in your browser, very large files (10,000+ lines) may take a moment to process. For best performance, we recommend files under 5,000 lines.</p>
+        <h3>Can I compare binary files?</h3>
+        <p>No, this tool is designed for text-based files only. Binary files (images, executables, etc.) are not supported.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free browser-based tools. All processing happens locally. Your files never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+let currentMode = 'unified';
+let lastDiff = null;
+
+document.getElementById('diff-file-left').addEventListener('change', e => {
+    if (e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = ev => { document.getElementById('diff-left').value = ev.target.result; };
+        reader.readAsText(e.target.files[0]);
+    }
+});
+document.getElementById('diff-file-right').addEventListener('change', e => {
+    if (e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = ev => { document.getElementById('diff-right').value = ev.target.result; };
+        reader.readAsText(e.target.files[0]);
+    }
+});
+
+// LCS-based diff algorithm
+function diffLines(oldLines, newLines) {
+    const m = oldLines.length, n = newLines.length;
+    // Build LCS table
+    const dp = Array.from({length: m + 1}, () => new Uint16Array(n + 1));
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (oldLines[i - 1] === newLines[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    // Backtrack to produce diff
+    const result = [];
+    let i = m, j = n;
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && oldLines[i - 1] === newLines[j - 1]) {
+            result.push({type: 'context', oldNum: i, newNum: j, text: oldLines[i - 1]});
+            i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+            result.push({type: 'added', newNum: j, text: newLines[j - 1]});
+            j--;
+        } else {
+            result.push({type: 'removed', oldNum: i, text: oldLines[i - 1]});
+            i--;
+        }
+    }
+    return result.reverse();
+}
+
+function computeDiff() {
+    const leftText = document.getElementById('diff-left').value;
+    const rightText = document.getElementById('diff-right').value;
+    const oldLines = leftText.split('\n');
+    const newLines = rightText.split('\n');
+
+    lastDiff = diffLines(oldLines, newLines);
+
+    const added = lastDiff.filter(d => d.type === 'added').length;
+    const removed = lastDiff.filter(d => d.type === 'removed').length;
+    const unchanged = lastDiff.filter(d => d.type === 'context').length;
+
+    document.getElementById('diff-stats').innerHTML =
+        `<span class="added">+${added} added</span>` +
+        `<span class="removed">-${removed} removed</span>` +
+        `<span class="unchanged">${unchanged} unchanged</span>`;
+
+    renderDiff();
+    document.getElementById('diff-result').style.display = '';
+}
+
+function renderDiff() {
+    if (!lastDiff) return;
+    const container = document.getElementById('diff-lines');
+    const contextLines = 3;
+
+    if (currentMode === 'unified') {
+        // Show only changed lines with context
+        const lines = lastDiff;
+        let html = '';
+        const changeIndices = new Set();
+        lines.forEach((line, idx) => {
+            if (line.type !== 'context') changeIndices.add(idx);
+        });
+
+        let lastShown = -1;
+        lines.forEach((line, idx) => {
+            let nearChange = false;
+            for (let k = Math.max(0, idx - contextLines); k <= Math.min(lines.length - 1, idx + contextLines); k++) {
+                if (changeIndices.has(k)) { nearChange = true; break; }
+            }
+            if (!nearChange && lines.length > 20) return;
+
+            if (lastShown >= 0 && idx - lastShown > 1) {
+                html += `<div class="diff-separator">···</div>`;
+            }
+            lastShown = idx;
+
+            const oldNum = line.oldNum || '';
+            const newNum = line.newNum || '';
+            const prefix = line.type === 'added' ? '+' : line.type === 'removed' ? '-' : ' ';
+            const escaped = escapeHtml(line.text);
+            html += `<div class="diff-line ${line.type}"><span class="line-num">${oldNum}</span><span class="line-num">${newNum}</span><span class="line-content">${prefix} ${escaped}</span></div>`;
+        });
+
+        if (!html) html = '<div style="padding:2rem;text-align:center;color:var(--text-dim);">No differences found — files are identical.</div>';
+        container.innerHTML = html;
+    } else {
+        // Inline mode — show all lines
+        let html = '';
+        lastDiff.forEach(line => {
+            const oldNum = line.oldNum || '';
+            const newNum = line.newNum || '';
+            const prefix = line.type === 'added' ? '+' : line.type === 'removed' ? '-' : ' ';
+            const escaped = escapeHtml(line.text);
+            html += `<div class="diff-line ${line.type}"><span class="line-num">${oldNum}</span><span class="line-num">${newNum}</span><span class="line-content">${prefix} ${escaped}</span></div>`;
+        });
+        if (!html) html = '<div style="padding:2rem;text-align:center;color:var(--text-dim);">No differences found — files are identical.</div>';
+        container.innerHTML = html;
+    }
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('mode-unified').classList.toggle('active', mode === 'unified');
+    document.getElementById('mode-inline').classList.toggle('active', mode === 'inline');
+    renderDiff();
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function clearAll() {
+    document.getElementById('diff-left').value = '';
+    document.getElementById('diff-right').value = '';
+    document.getElementById('diff-result').style.display = 'none';
+    lastDiff = null;
+}
+</script>
+</body>
+</html>

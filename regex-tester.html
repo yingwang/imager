@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Tester — SnapTools | Free Online Regular Expression Tester</title>
+    <meta name="description" content="Test regular expressions with real-time matching, capture groups, and match highlighting. Free, private, browser-based regex tool.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/regex-tester.html">
+    <meta property="og:title" content="Free Regex Tester — Test Regular Expressions Online">
+    <meta property="og:description" content="Test regular expressions with real-time matching and capture groups. Free, private, browser-based.">
+    <meta property="og:url" content="https://snaptools.app/regex-tester.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SnapTools">
+
+    <meta name="google-adsense-account" content="ca-pub-5454343993694013">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .regex-input-row {
+            display: flex; gap: 0.5rem; align-items: center; margin-top: 1.5rem;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1rem;
+        }
+        .regex-input-row span.slash { color: var(--text-dim); font-family: 'Space Mono', monospace; font-size: 1.2rem; }
+        .regex-input-row input[type="text"] {
+            flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--accent-light);
+            border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .regex-input-row input[type="text"]:focus { outline: none; border-color: var(--accent); }
+        .regex-flags { display: flex; gap: 0.5rem; }
+        .regex-flags label {
+            display: flex; align-items: center; gap: 0.3rem; cursor: pointer;
+            font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--text-dim);
+            background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 0.3rem 0.6rem; transition: all 0.2s;
+        }
+        .regex-flags label:has(input:checked) { border-color: var(--accent); color: var(--accent-light); background: rgba(108,92,231,0.1); }
+        .regex-flags input { display: none; }
+        .regex-error { color: var(--pink); font-size: 0.85rem; margin-top: 0.5rem; font-family: 'Space Mono', monospace; }
+        .test-area { margin-top: 1rem; }
+        .test-area label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .test-area textarea {
+            width: 100%; height: 200px; resize: vertical;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text);
+            border-radius: var(--radius-sm); padding: 1rem; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem; line-height: 1.6;
+        }
+        .test-area textarea:focus { outline: none; border-color: var(--accent); }
+        .highlighted-text {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 1rem; margin-top: 1rem;
+            font-family: 'Space Mono', monospace; font-size: 0.85rem; line-height: 1.8;
+            white-space: pre-wrap; word-break: break-all; min-height: 60px;
+        }
+        .highlighted-text mark { background: rgba(108,92,231,0.3); color: var(--accent-light); border-radius: 3px; padding: 1px 2px; }
+        .match-info {
+            margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1rem;
+        }
+        .match-info h4 { font-size: 0.9rem; margin-bottom: 0.8rem; }
+        .match-item {
+            padding: 0.5rem 0.8rem; background: var(--surface2); border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem; font-family: 'Space Mono', monospace; font-size: 0.82rem;
+        }
+        .match-item .match-label { color: var(--text-dim); font-size: 0.75rem; display: block; margin-bottom: 0.2rem; }
+        .match-item .match-value { color: var(--accent-light); }
+        .match-item .group-value { color: var(--green); }
+        .match-count {
+            font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--green);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-regex">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>Regex Tester</h2>
+        </div>
+
+        <div class="regex-input-row">
+            <span class="slash">/</span>
+            <input type="text" id="regex-pattern" placeholder="Enter your regex pattern..." value="\b\w+@\w+\.\w+\b">
+            <span class="slash">/</span>
+            <div class="regex-flags">
+                <label><input type="checkbox" id="flag-g" checked>g</label>
+                <label><input type="checkbox" id="flag-i">i</label>
+                <label><input type="checkbox" id="flag-m">m</label>
+                <label><input type="checkbox" id="flag-s">s</label>
+            </div>
+        </div>
+        <div id="regex-error"></div>
+
+        <div class="test-area">
+            <label>Test String</label>
+            <textarea id="regex-test">Hello, my email is user@example.com and my work email is john.doe@company.org. Contact us at info@snaptools.app for more info.</textarea>
+        </div>
+
+        <div class="match-count" id="match-count"></div>
+        <div class="highlighted-text" id="highlighted-output"></div>
+
+        <div class="match-info" id="match-info" style="display:none;">
+            <h4>Match Details</h4>
+            <div id="match-details"></div>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online Regex Tester</h2>
+        <p>SnapTools Regex Tester lets you write and test regular expressions with real-time matching and visual highlighting. See matches highlighted in your test string, inspect capture groups, and experiment with flags — all in your browser.</p>
+        <p>Supports JavaScript regex syntax with global (g), case-insensitive (i), multiline (m), and dotAll (s) flags.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>What regex flavor is used?</h3>
+        <p>This tool uses JavaScript's built-in RegExp engine. The syntax is compatible with most common regex patterns used in JavaScript, Python, and other languages.</p>
+        <h3>What are capture groups?</h3>
+        <p>Capture groups are portions of a regex pattern enclosed in parentheses. They allow you to extract specific parts of a match. This tool shows all capture groups for each match in the Match Details panel.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free browser-based tools. All processing happens locally. Your files never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+const patternInput = document.getElementById('regex-pattern');
+const testInput = document.getElementById('regex-test');
+const errorDiv = document.getElementById('regex-error');
+const highlightedOutput = document.getElementById('highlighted-output');
+const matchCount = document.getElementById('match-count');
+const matchInfo = document.getElementById('match-info');
+const matchDetails = document.getElementById('match-details');
+
+function getFlags() {
+    let flags = '';
+    if (document.getElementById('flag-g').checked) flags += 'g';
+    if (document.getElementById('flag-i').checked) flags += 'i';
+    if (document.getElementById('flag-m').checked) flags += 'm';
+    if (document.getElementById('flag-s').checked) flags += 's';
+    return flags;
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function update() {
+    const pattern = patternInput.value;
+    const test = testInput.value;
+    const flags = getFlags();
+
+    if (!pattern) {
+        errorDiv.innerHTML = '';
+        highlightedOutput.innerHTML = escapeHtml(test);
+        matchCount.innerHTML = '';
+        matchInfo.style.display = 'none';
+        return;
+    }
+
+    let regex;
+    try {
+        regex = new RegExp(pattern, flags);
+        errorDiv.innerHTML = '';
+    } catch(e) {
+        errorDiv.innerHTML = `<div class="regex-error">${e.message}</div>`;
+        highlightedOutput.innerHTML = escapeHtml(test);
+        matchCount.innerHTML = '';
+        matchInfo.style.display = 'none';
+        return;
+    }
+
+    // Find all matches
+    const matches = [];
+    if (flags.includes('g')) {
+        let m;
+        while ((m = regex.exec(test)) !== null) {
+            matches.push({index: m.index, length: m[0].length, value: m[0], groups: [...m].slice(1)});
+            if (m[0].length === 0) { regex.lastIndex++; }
+        }
+    } else {
+        const m = regex.exec(test);
+        if (m) {
+            matches.push({index: m.index, length: m[0].length, value: m[0], groups: [...m].slice(1)});
+        }
+    }
+
+    matchCount.textContent = `${matches.length} match${matches.length !== 1 ? 'es' : ''} found`;
+
+    // Build highlighted output
+    let html = '';
+    let lastIndex = 0;
+    for (const m of matches) {
+        html += escapeHtml(test.slice(lastIndex, m.index));
+        html += '<mark>' + escapeHtml(test.slice(m.index, m.index + m.length)) + '</mark>';
+        lastIndex = m.index + m.length;
+    }
+    html += escapeHtml(test.slice(lastIndex));
+    highlightedOutput.innerHTML = html || escapeHtml(test);
+
+    // Match details
+    if (matches.length > 0) {
+        matchInfo.style.display = '';
+        let detailsHtml = '';
+        matches.slice(0, 50).forEach((m, i) => {
+            detailsHtml += `<div class="match-item"><span class="match-label">Match ${i + 1} (index ${m.index})</span><span class="match-value">${escapeHtml(m.value)}</span>`;
+            if (m.groups.length > 0) {
+                m.groups.forEach((g, gi) => {
+                    detailsHtml += `<br><span class="match-label">  Group ${gi + 1}:</span> <span class="group-value">${g !== undefined ? escapeHtml(g) : 'undefined'}</span>`;
+                });
+            }
+            detailsHtml += '</div>';
+        });
+        if (matches.length > 50) detailsHtml += '<div class="match-item" style="color:var(--text-dim);">... and ' + (matches.length - 50) + ' more matches</div>';
+        matchDetails.innerHTML = detailsHtml;
+    } else {
+        matchInfo.style.display = 'none';
+    }
+}
+
+patternInput.addEventListener('input', update);
+testInput.addEventListener('input', update);
+document.querySelectorAll('.regex-flags input').forEach(cb => cb.addEventListener('change', update));
+
+update();
+</script>
+</body>
+</html>

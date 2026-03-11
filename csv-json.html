@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV ↔ JSON Converter — SnapTools | Free Online Data Converter</title>
+    <meta name="description" content="Convert between CSV and JSON formats instantly. Handles headers, quoted fields, and large files. Free, private, browser-based.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://snaptools.app/csv-json.html">
+    <meta property="og:title" content="Free CSV to JSON Converter — Convert Data Formats Online">
+    <meta property="og:description" content="Convert between CSV and JSON formats instantly. Free, private, browser-based.">
+    <meta property="og:url" content="https://snaptools.app/csv-json.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SnapTools">
+
+    <meta name="google-adsense-account" content="ca-pub-5454343993694013">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5454343993694013" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .csv-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+        .csv-panel label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .csv-panel textarea {
+            width: 100%; height: 350px; resize: vertical;
+            background: var(--surface); border: 1px solid var(--border); color: var(--text);
+            border-radius: var(--radius-sm); padding: 1rem; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem; line-height: 1.6; tab-size: 2;
+        }
+        .csv-panel textarea:focus { outline: none; border-color: var(--accent); }
+        .csv-mode {
+            display: flex; gap: 0.5rem; margin-top: 1.5rem; justify-content: center;
+        }
+        .csv-mode button {
+            background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
+            border-radius: var(--radius-sm); padding: 0.6rem 1.2rem; font-size: 0.9rem;
+            cursor: pointer; font-family: inherit; transition: all 0.2s;
+        }
+        .csv-mode button.active { border-color: var(--accent); color: var(--accent-light); background: rgba(108,92,231,0.1); }
+        .csv-options {
+            display: flex; gap: 1rem; align-items: center; justify-content: center;
+            margin-top: 1rem; flex-wrap: wrap;
+        }
+        .csv-options label { font-size: 0.85rem; color: var(--text-dim); display: flex; align-items: center; gap: 0.3rem; }
+        .csv-options select, .csv-options input[type="text"] {
+            background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+            border-radius: var(--radius-sm); padding: 0.3rem 0.6rem; font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+        .csv-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+        .csv-error { color: var(--pink); font-size: 0.85rem; margin-top: 0.5rem; text-align: center; font-family: 'Space Mono', monospace; }
+        @media (max-width: 768px) { .csv-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo" style="text-decoration:none;">Snap<span>Tools</span></a>
+        <nav>
+            <a href="/">Tools</a>
+            <a href="/about.html">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="workspace active" id="tool-csv">
+        <div class="workspace-header">
+            <a href="/" class="back-btn">← Back to Tools</a>
+            <h2>CSV ↔ JSON Converter</h2>
+        </div>
+
+        <div class="csv-mode">
+            <button class="active" id="mode-csv2json" onclick="setMode('csv2json')">CSV → JSON</button>
+            <button id="mode-json2csv" onclick="setMode('json2csv')">JSON → CSV</button>
+        </div>
+
+        <div class="csv-options">
+            <label>Delimiter: <select id="csv-delimiter">
+                <option value=",">Comma (,)</option>
+                <option value=";">Semicolon (;)</option>
+                <option value="\t">Tab</option>
+                <option value="|">Pipe (|)</option>
+            </select></label>
+        </div>
+
+        <div class="csv-container">
+            <div class="csv-panel">
+                <label id="input-label">CSV Input</label>
+                <textarea id="csv-input" placeholder="name,age,city&#10;Alice,30,New York&#10;Bob,25,London&#10;Charlie,35,Tokyo"></textarea>
+            </div>
+            <div class="csv-panel">
+                <label id="output-label">JSON Output</label>
+                <textarea id="csv-output" readonly></textarea>
+            </div>
+        </div>
+
+        <div id="csv-error"></div>
+
+        <div class="csv-actions">
+            <button class="action-btn" onclick="convert()">Convert</button>
+            <button class="secondary-btn" onclick="copyOutput()">Copy Output</button>
+            <button class="secondary-btn" onclick="downloadOutput()">Download</button>
+            <button class="secondary-btn" onclick="clearAll()">Clear</button>
+        </div>
+    </div>
+
+    <section class="seo-section">
+        <h2>Free Online CSV to JSON Converter</h2>
+        <p>SnapTools CSV ↔ JSON Converter lets you convert between CSV (Comma-Separated Values) and JSON (JavaScript Object Notation) formats instantly. Handles headers, quoted fields, and various delimiters. Perfect for data migration, API preparation, and spreadsheet processing.</p>
+        <p>All processing happens in your browser — your data never leaves your device.</p>
+
+        <h2>Frequently Asked Questions</h2>
+        <h3>Does it handle quoted fields?</h3>
+        <p>Yes. Fields enclosed in double quotes are properly parsed, including fields that contain commas or newlines within quotes.</p>
+        <h3>Can I use different delimiters?</h3>
+        <p>Yes. You can choose between comma, semicolon, tab, or pipe as the delimiter for your CSV data.</p>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="/about.html">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+    <p>SnapTools — Free browser-based tools. All processing happens locally. Your files never leave your device.</p>
+    <p style="margin-top:0.5rem;">© 2026 SnapTools. Built with ❤️</p>
+</footer>
+
+<script>
+let currentMode = 'csv2json';
+
+function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('mode-csv2json').classList.toggle('active', mode === 'csv2json');
+    document.getElementById('mode-json2csv').classList.toggle('active', mode === 'json2csv');
+    document.getElementById('input-label').textContent = mode === 'csv2json' ? 'CSV Input' : 'JSON Input';
+    document.getElementById('output-label').textContent = mode === 'csv2json' ? 'JSON Output' : 'CSV Output';
+    document.getElementById('csv-input').placeholder = mode === 'csv2json'
+        ? 'name,age,city\nAlice,30,New York\nBob,25,London'
+        : '[{"name":"Alice","age":30},{"name":"Bob","age":25}]';
+    document.getElementById('csv-output').value = '';
+    document.getElementById('csv-error').innerHTML = '';
+}
+
+function parseCSV(text, delimiter) {
+    const rows = [];
+    let current = '';
+    let inQuotes = false;
+    let row = [];
+
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inQuotes) {
+            if (ch === '"' && text[i + 1] === '"') {
+                current += '"'; i++;
+            } else if (ch === '"') {
+                inQuotes = false;
+            } else {
+                current += ch;
+            }
+        } else {
+            if (ch === '"') {
+                inQuotes = true;
+            } else if (ch === delimiter) {
+                row.push(current); current = '';
+            } else if (ch === '\n' || (ch === '\r' && text[i + 1] === '\n')) {
+                row.push(current); current = '';
+                if (row.some(c => c.trim())) rows.push(row);
+                row = [];
+                if (ch === '\r') i++;
+            } else {
+                current += ch;
+            }
+        }
+    }
+    row.push(current);
+    if (row.some(c => c.trim())) rows.push(row);
+    return rows;
+}
+
+function csvToJSON(text, delimiter) {
+    const rows = parseCSV(text, delimiter);
+    if (rows.length < 2) throw new Error('CSV must have at least a header row and one data row');
+    const headers = rows[0].map(h => h.trim());
+    return rows.slice(1).map(row => {
+        const obj = {};
+        headers.forEach((h, i) => {
+            let val = (row[i] || '').trim();
+            if (val !== '' && !isNaN(val) && val !== '') val = Number(val);
+            obj[h] = val;
+        });
+        return obj;
+    });
+}
+
+function jsonToCSV(text, delimiter) {
+    const data = JSON.parse(text);
+    if (!Array.isArray(data) || data.length === 0) throw new Error('JSON must be a non-empty array of objects');
+    const headers = Object.keys(data[0]);
+    const escape = val => {
+        const str = String(val === null || val === undefined ? '' : val);
+        if (str.includes(delimiter) || str.includes('"') || str.includes('\n')) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    };
+    const rows = [headers.map(escape).join(delimiter)];
+    for (const item of data) {
+        rows.push(headers.map(h => escape(item[h])).join(delimiter));
+    }
+    return rows.join('\n');
+}
+
+function convert() {
+    const input = document.getElementById('csv-input').value.trim();
+    const output = document.getElementById('csv-output');
+    const error = document.getElementById('csv-error');
+    let delimiter = document.getElementById('csv-delimiter').value;
+    if (delimiter === '\\t') delimiter = '\t';
+
+    if (!input) { error.innerHTML = '<div class="csv-error">Please enter some data</div>'; return; }
+
+    try {
+        if (currentMode === 'csv2json') {
+            const result = csvToJSON(input, delimiter);
+            output.value = JSON.stringify(result, null, 2);
+        } else {
+            const result = jsonToCSV(input, delimiter);
+            output.value = result;
+        }
+        error.innerHTML = '';
+    } catch(e) {
+        error.innerHTML = `<div class="csv-error">Error: ${e.message}</div>`;
+    }
+}
+
+function copyOutput() {
+    const text = document.getElementById('csv-output').value;
+    if (text) navigator.clipboard.writeText(text);
+}
+
+function downloadOutput() {
+    const text = document.getElementById('csv-output').value;
+    if (!text) return;
+    const ext = currentMode === 'csv2json' ? 'json' : 'csv';
+    const mime = currentMode === 'csv2json' ? 'application/json' : 'text/csv';
+    const blob = new Blob([text], {type: mime});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'converted.' + ext;
+    a.click();
+}
+
+function clearAll() {
+    document.getElementById('csv-input').value = '';
+    document.getElementById('csv-output').value = '';
+    document.getElementById('csv-error').innerHTML = '';
+}
+</script>
+</body>
+</html>
